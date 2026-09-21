@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Multi-Agent Lab - Web Console</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f4ff; height: 100vh; display: flex; flex-direction: column; }
+.header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; padding: 10px 20px; box-shadow: 0 2px 8px rgba(79,70,229,.3); }
+.header h1 { font-size: 16px; }
+.main { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: 260px; background: #fff; border-right: 1px solid #e2e8f0; overflow-y: auto; padding: 10px; }
+.phase-group { margin-bottom: 12px; }
+.phase-title { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
+.phase-p0 { background: #eef2ff; color: #4f46e5; }
+.phase-p1 { background: #ecfdf5; color: #059669; }
+.phase-p2 { background: #ecfdf5; color: #059669; }
+.phase-p3 { background: #fef2f2; color: #dc2626; }
+.phase-p4 { background: #f5f3ff; color: #7c3aed; }
+.demo-item { padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid #e2e8f0; transition: all .2s; font-size: 12px; }
+.demo-item:hover { background: #eef2ff; }
+.demo-item.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.demo-item .name { font-weight: 600; }
+.demo-item .desc { font-size: 10px; opacity: .7; margin-top: 1px; }
+.demo-item .badge { display: inline-block; padding: 0 5px; border-radius: 6px; font-size: 9px; margin-top: 2px; }
+.demo-item .badge.need-key { background: #fef3c7; color: #92400e; }
+.demo-item .badge.offline { background: #d1fae5; color: #065f46; }
+.right-panel { flex: 1; display: flex; flex-direction: column; }
+.chat-area { flex: 1; display: flex; flex-direction: column; background: #f8fafc; min-height: 0; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 12px; }
+.msg { max-width: 75%; margin-bottom: 8px; padding: 8px 12px; border-radius: 8px; line-height: 1.6; white-space: pre-wrap; font-size: 12px; }
+.msg.user { background: #4f46e5; color: #fff; margin-left: auto; }
+.msg.assistant { background: #fff; border: 1px solid #e2e8f0; }
+.chat-input { padding: 8px 12px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
+.chat-input input { flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
+.chat-input input:focus { border-color: #4f46e5; }
+.chat-input button { padding: 8px 16px; background: #4f46e5; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.chat-input button:hover { background: #4338ca; }
+.empty { text-align: center; color: #94a3b8; margin-top: 80px; font-size: 13px; }
+.provider-select { margin-top: 12px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+.provider-select h3 { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+.provider-select select { width: 100%; padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 12px; }
+/* 日志面板 */
+.log-panel { height: 180px; background: #1e1e2e; color: #cdd6f4; display: flex; flex-direction: column; resize: vertical; overflow: hidden; min-height: 80px; max-height: 600px; }
+/* 拖动条 */
+.log-resizer { height: 6px; background: #4f46e5; cursor: row-resize; flex-shrink: 0; }
+.log-resizer:hover { background: #7c3aed; }
+.log-header { padding: 4px 12px; background: #2a2a3c; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+.log-header .title { font-weight: 600; }
+.log-header .actions button { background: #475569; color: #fff; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 4px; }
+.log-header .actions button:hover { background: #64748b; }
+.log-content { flex: 1; overflow-y: auto; padding: 8px 12px; font-family: "JetBrains Mono", Consolas, monospace; font-size: 10px; line-height: 1.5; }
+.log-line { margin-bottom: 1px; }
+.log-line.info { color: #cdd6f4; }
+.log-line.warn { color: #fbbf24; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Java Multi-Agent Lab · Web Console</h1>
+</div>
+<div class="main">
+<div class="sidebar">
+<h3 style="font-size:11px;color:#64748b;margin-bottom:8px">选择 Demo</h3>
+<div id="demo-list"></div>
+<div class="provider-select">
+<h3>LLM Provider</h3>
+<select id="provider">
+<option value="deepseek">DeepSeek（云端）</option>
+<option value="ollama">Ollama（本地）</option>
+</select>
+</div>
+</div>
+<div class="right-panel">
+<div class="chat-area">
+<div class="chat-messages" id="messages">
+<div class="empty">← 从左侧选择一个 Demo 开始对话</div>
+</div>
+<div class="chat-input">
+<input type="text" id="input" placeholder="输入消息...（Enter 发送）" disabled>
+<button id="send" disabled>发送</button>
+</div>
+</div>
+<div class="log-panel" id="logPanel">
+<div class="log-resizer" id="logResizer"></div>
+<div class="log-header">
+<span class="title">📋 流程日志（实时，可上下拖动调整高度）</span>
+<div class="actions">
+<button onclick="clearLogs()">清空</button>
+<button onclick="toggleLog()">隐藏</button>
+</div>
+</div>
+<div class="log-content" id="log-content"></div>
+</div>
+</div>
+</div>
+<script>
+var currentDemo = null;
+var sessionId = 'session-' + Date.now();
+
+// 加载 Demo 列表
+fetch('/api/demos').then(r => r.json()).then(demos => {
+  var list = document.getElementById('demo-list');
+  var phases = {};
+  demos.forEach(d => {
+    if (!phases[d.phase]) phases[d.phase] = [];
+    phases[d.phase].push(d);
+  });
+  Object.keys(phases).forEach(phase => {
+    var title = document.createElement('div');
+    title.className = 'phase-title phase-' + phase.toLowerCase().replace(' ','');
+    title.textContent = phase;
+    list.appendChild(title);
+    phases[phase].forEach(d => {
+      var div = document.createElement('div');
+      div.className = 'demo-item';
+      div.innerHTML = '<div class="name">' + d.name + '</div>' +
+                     '<div class="desc">' + d.description + '</div>' +
+                     '<span class="badge ' + (d.needApiKey ? 'need-key' : 'offline') + '">' +
+                     (d.needApiKey ? '需 Key' : '离线') + '</span>';
+      div.onclick = () => selectDemo(d.id, div);
+      list.appendChild(div);
+    });
+  });
+});
+
+function selectDemo(id, el) {
+  currentDemo = id;
+  document.querySelectorAll('.demo-item').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('input').disabled = false;
+  document.getElementById('send').disabled = false;
+  document.getElementById('messages').innerHTML = '';
+  addMsg('assistant', '已加载 ' + el.querySelector('.name').textContent + '，开始对话吧！');
+}
+
+function addMsg(type, text) {
+  var div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.textContent = text;
+  document.getElementById('messages').appendChild(div);
+  document.getElementById('messages').scrollTop = 99999;
+}
+
+function send() {
+  var input = document.getElementById('input');
+  var text = input.value.trim();
+  if (!text || !currentDemo) return;
+  addMsg('user', text);
+  input.value = '';
+  fetch('/api/chat?demoId=' + currentDemo + '&sessionId=' + sessionId + '&input=' + encodeURIComponent(text))
+    .then(r => r.json())
+    .then(data => addMsg('assistant', data.reply));
+}
+
+document.getElementById('send').onclick = send;
+document.getElementById('input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') send();
+});
+
+// 日志轮询
+function pollLogs() {
+  fetch('/api/logs')
+    .then(r => r.json())
+    .then(logs => {
+      var container = document.getElementById('log-content');
+      logs.forEach(line => {
+        var div = document.createElement('div');
+        div.className = 'log-line ' + (line.includes('失败') || line.includes('错误') ? 'warn' : 'info');
+        div.textContent = line;
+        container.appendChild(div);
+      });
+      container.scrollTop = 99999;
+    });
+}
+setInterval(pollLogs, 1000);
+
+function clearLogs() {
+  fetch('/api/logs/clear', { method: 'POST' });
+  document.getElementById('log-content').innerHTML = '';
+}
+
+function toggleLog() {
+  var panel = document.getElementById('logPanel');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'flex';
+    event.target.textContent = '隐藏';
+  } else {
+    panel.style.display = 'none';
+    event.target.textContent = '显示';
+  }
+}
+
+// 日志面板拖动调整高度
+(function() {
+  var resizer = document.getElementById('logResizer');
+  var panel = document.getElementById('logPanel');
+  var startY, startHeight;
+
+  resizer.addEventListener('mousedown', function(e) {
+    startY = e.clientY;
+    startHeight = panel.offsetHeight;
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+
+    function onMouseMove(e) {
+      var delta = startY - e.clientY;
+      var newHeight = startHeight + delta;
+      if (newHeight >= 80 && newHeight <= 600) {
+        panel.style.height = newHeight + 'px';
+      }
+    }
+
+    function onMouseUp() {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>S2.4 上下文压缩 - Java Multi-Agent Lab</title>
+<style>
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:900px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#fafafa}
+.badge{display:inline-block;background:#059669;color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;margin-right:8px}
+h1{color:#064e3b;border-bottom:3px solid #059669;padding-bottom:8px}
+h2{color:#059669;margin-top:32px;border-left:4px solid #059669;padding-left:10px}
+pre{background:#1e1e2e;color:#cdd6f4;padding:14px;border-radius:8px;overflow-x:auto;font-size:13px}
+code{background:#d1fae5;padding:2px 6px;border-radius:4px;font-size:13px}
+pre code{background:none;padding:0;color:inherit}
+.nav{display:flex;justify-content:space-between;margin:32px 0;padding:12px;background:#d1fae5;border-radius:8px}
+.nav a{color:#059669;text-decoration:none;font-weight:bold}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:16px 0}
+.step{background:#fff;padding:12px 16px;margin:8px 0;border-radius:8px;border:1px solid #d1fae5}
+.step b{color:#059669}
+
+/* === 统一美化覆盖 === */
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:#1e293b;background:#f8fafc}
+h1{color:#1e293b;border-bottom:3px solid #4f46e5;padding-bottom:14px;font-size:28px}
+h2{color:#4f46e5;border-left:4px solid #4f46e5;padding-left:12px;margin-top:36px;font-size:20px}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:5px;font-family:"JetBrains Mono",Consolas,monospace}
+.step{background:#fff;padding:14px 18px;border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:#4f46e5;font-weight:600}
+table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th{background:#eef2ff;color:#4f46e5;font-weight:600}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1><span class="badge">S2.4</span>上下文压缩：四层管线</h1>
+<p><b>模块：</b><code>context-compact</code></p>
+
+<h2>1. 这个模块解决了什么</h2>
+<p>对话越跑越长，token 超限就报错。上下文压缩：四层管线从粗到细压缩历史，让上下文不超限。</p>
+
+<h2>2. 四层管线（顺序固定）</h2>
+<div class="step"><b>L3 大结果落盘：</b>工具返回的大结果（文件内容等）先落盘，上下文里只留引用。</div>
+<div class="step"><b>L1 裁中间：</b>留头 3 条 + 尾 N 条，中间裁掉。tool_use/tool_result 配对保护。</div>
+<div class="step"><b>L2 旧结果占位：</b>旧工具结果替换成"结果见引用"占位符。</div>
+<div class="step"><b>L4 LLM 摘要：</b>前三层不够，LLM 全量摘要历史（阈值触发）。</div>
+
+<h2>3. 逻辑流程</h2>
+<pre>messages 累积
+   ↓
+L3（大结果落盘）→ L1（裁中间）→ L2（旧结果占位）→ L4（LLM 摘要，按需）
+   ↓
+压缩后的 messages 继续跑</pre>
+
+<h2>4. 实测数据</h2>
+<div class="callout"><b>实测：</b>84 条 → 53 条，节省 ≈36k token。</div>
+
+<h2>5. 关键设计</h2>
+<pre>tool_use/tool_result 配对保护：切口压在 ToolResult 上时 headEnd 自动推进，不拆配对。
+token 估算 = 总字符数/4（教学简化）。</pre>
+
+<h2>5.5 核心类详解</h2>
+<h3>Compactor（压缩器）</h3>
+<div class="step">
+<b>作用：</b>对话太长时，自动压缩历史消息。<br><br>
+<b>方法：</b>
+<table>
+<tr><th>方法</th><th>作用</th><th>输入</th><th>输出</th></tr>
+<tr><td><code>compact(List&lt;ChatMessage&gt; messages)</code></td><td>压缩消息</td><td>消息列表</td><td>压缩后的摘要</td></tr>
+</table>
+</div>
+<h3>Summarizer（摘要生成器）</h3>
+<div class="step">
+<b>作用：</b>用 LLM 生成对话摘要，保留关键信息。
+</div>
+<h3>MessageWindow（消息窗口）</h3>
+<div class="step">
+<b>作用：</b>管理消息窗口，超出大小触发压缩。
+</div>
+<h2>🚀 初学者快速上手</h2>
+<div class="step"><b>前置知识：</b>理解 token 限制（对话太长会超限报错）。</div>
+<div class="step"><b>核心概念一句话：</b>对话太长了，从粗到细压缩历史，让上下文不超限。</div>
+<div class="step"><b>实测数据：</b>跑 CompactDemo 看 84 条压成 53 条，省 36k token。</div>
+
+<h2>6. 运行命令</h2>
+<pre>mvn -q -pl s24-context-compact exec:java "-Dexec.mainClass=com.example.agentlab.contextcompact.CompactDemo"</pre>
+
+<div class="callout"><b>顺序固定：</b>budget 必须最先跑——micro 会把旧结果替换成占位符，顺序错了就丢信息。</div>
+
+
+<h2>🌟 Web Console 体验示例</h2>
+<div class="step">
+<b>启动 Web Console：</b><code>mvn -pl web-console spring-boot:run</code>，然后打开 <b>http://localhost:8080</b>
+</div>
+<table>
+<tr><th>操作</th><th>内容</th></tr>
+<tr><td>左侧选择 Demo</td><td><code>s24</code></td></tr>
+<tr><td>输入示例</td><td><code>讲一个 1000 字的长故事，然后问我故事的开头是什么</code></td></tr>
+<tr><td>预期效果</td><td>上下文太长时自动压缩 → 关键信息保留</td></tr>
+</table>
+<div class="callout">💡 <b>小技巧：</b>底部日志面板会实时打印每一步流程，拖动蓝色条可以调整日志面板高度。</div>
+<div class="nav">
+<a href="s23-memory.html">← S2.3 记忆</a>
+<a href="index.html">全集目录</a>
+<a href="s25-error-recovery.html">S2.5 错误恢复 →</a>
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>S3.5 自组织与任务板 - Java Multi-Agent Lab</title>
+<style>
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:900px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#fafafa}
+.badge{display:inline-block;background:#dc2626;color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;margin-right:8px}
+h1{color:#7f1d1d;border-bottom:3px solid #dc2626;padding-bottom:8px}
+h2{color:#dc2626;margin-top:32px;border-left:4px solid #dc2626;padding-left:10px}
+pre{background:#1e1e2e;color:#cdd6f4;padding:14px;border-radius:8px;overflow-x:auto;font-size:13px}
+code{background:#fee2e2;padding:2px 6px;border-radius:4px;font-size:13px}
+pre code{background:none;padding:0;color:inherit}
+.nav{display:flex;justify-content:space-between;margin:32px 0;padding:12px;background:#fee2e2;border-radius:8px}
+.nav a{color:#dc2626;text-decoration:none;font-weight:bold}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:16px 0}
+.step{background:#fff;padding:12px 16px;margin:8px 0;border-radius:8px;border:1px solid #fee2e2}
+.step b{color:#dc2626}
+
+/* === 统一美化覆盖 === */
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:#1e293b;background:#f8fafc}
+h1{color:#1e293b;border-bottom:3px solid #4f46e5;padding-bottom:14px;font-size:28px}
+h2{color:#4f46e5;border-left:4px solid #4f46e5;padding-left:12px;margin-top:36px;font-size:20px}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:5px;font-family:"JetBrains Mono",Consolas,monospace}
+.step{background:#fff;padding:14px 18px;border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:#4f46e5;font-weight:600}
+table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th{background:#eef2ff;color:#4f46e5;font-weight:600}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1><span class="badge">S3.5</span>自组织与任务板：没人派活，自己认领</h1>
+<p><b>模块：</b><code>taskboard</code></p>
+
+<h2>1. 这个模块解决了什么</h2>
+<p>没有领导逐个派活——Agent 看共享任务板，自己认领能干的任务。某个 worker 宕机，超时后任务释放，别人接手。</p>
+
+<h2>2. 机制</h2>
+<pre>TaskCard(id, title, requiredSkill, status, claimedBy, claimedAt)
+   status: PENDING → CLAIMED → DONE
+              ↑           ↓
+              └── release（超时释放回 PENDING）</pre>
+
+<h2>3. 关键设计</h2>
+<div class="step"><b>乐观锁认领：</b>synchronized 块里只有 PENDING 才认领——两个 worker 抢同一任务，只有一个成功。</div>
+<div class="step"><b>技能匹配：</b>worker 按 skill() 找 listBySkill() 的 PENDING 任务。</div>
+<div class="step"><b>宕机交接：</b>认领超时未完成 → release 回 PENDING → 别人接手。</div>
+
+<h2>5.5 核心类详解</h2>
+<h3>TaskBoardDemo（演示入口）</h3>
+<div class="step">
+<b>作用：</b>启动任务板演示，展示多 worker 自组织认领任务。
+</div>
+<h3>TaskBoard（任务板）</h3>
+<div class="step">
+<b>作用：</b>任务队列，管理任务状态。<br><br>
+<b>方法：</b>
+<table>
+<tr><th>方法</th><th>作用</th><th>输入</th><th>输出</th></tr>
+<tr><td><code>submit(TaskCard task)</code></td><td>提交任务</td><td>任务卡片</td><td>无</td></tr>
+<tr><td><code>claim(String taskId, String workerId)</code></td><td>认领任务（乐观锁）</td><td>任务 ID、worker ID</td><td>是否认领成功</td></tr>
+</table>
+</div>
+<h3>TaskCard（任务卡片）</h3>
+<div class="step">
+<b>作用：</b>任务的数据结构。<br><br>
+<b>字段：</b>id / title / skill / status / assignee
+</div>
+<h3>TaskStatus（任务状态枚举）</h3>
+<div class="step">
+<b>作用：</b>任务状态。<br><br>
+<b>枚举值：</b>PENDING / RUNNING / DONE
+</div>
+<h3>Worker（工人接口）</h3>
+<div class="step">
+<b>作用：</b>定义工人的接口。
+</div>
+<h3>AutonomousCoordinator（自组织协调器）</h3>
+<div class="step">
+<b>作用：</b>协调多个 worker 认领任务。
+</div>
+<h2>🚀 初学者快速上手</h2>
+<div class="step"><b>前置知识：</b>理解"乐观锁"（多人抢同一资源，只有一个成功）。</div>
+<div class="step"><b>核心概念一句话：</b>没人派活，Agent 自己看任务板认领，宕机了别人接手。</div>
+<div class="step"><b>跑起来看：</b>TaskBoardDemo 里 3 个 worker 各认领匹配技能的任务。</div>
+
+<h2>4. 运行命令</h2>
+<pre>mvn -q -pl s35-taskboard exec:java "-Dexec.mainClass=com.example.agentlab.taskboard.TaskBoardDemo"</pre>
+
+<div class="callout"><b>核心：</b>自组织——无领导派活，worker 自主协作、容错。</div>
+
+
+<h2>🌟 Web Console 体验示例</h2>
+<div class="step">
+<b>启动 Web Console：</b><code>mvn -pl web-console spring-boot:run</code>，然后打开 <b>http://localhost:8080</b>
+</div>
+<table>
+<tr><th>操作</th><th>内容</th></tr>
+<tr><td>左侧选择 Demo</td><td><code>s35</code></td></tr>
+<tr><td>输入示例</td><td><code>帮我管理一个任务列表</code></td></tr>
+<tr><td>预期效果</td><td>任务板：认领任务（乐观锁）→ 完成 → 状态更新</td></tr>
+</table>
+<div class="callout">💡 <b>小技巧：</b>底部日志面板会实时打印每一步流程，拖动蓝色条可以调整日志面板高度。</div>
+<div class="nav">
+<a href="s34-checkpoint.html">← S3.4 检查点</a>
+<a href="index.html">全集目录</a>
+<a href="s36-bus.html">S3.6 总线 →</a>
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S0.1 环境搭建 - Java Multi-Agent Lab</title>
+<style>
+:root{--primary:#4f46e5;--primary-light:#eef2ff;--accent:#059669;--warn:#f59e0b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0}
+*{box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:var(--text);background:var(--bg)}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-right:10px;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+h1{color:var(--text);font-size:28px;border-bottom:3px solid var(--primary);padding-bottom:14px;margin-top:0}
+h2{color:var(--primary);margin-top:36px;font-size:20px;border-left:4px solid var(--primary);padding-left:12px}
+h3{color:#334155;margin-top:24px;font-size:16px}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:13.5px;line-height:1.6;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:var(--primary-light);color:var(--primary);padding:2px 7px;border-radius:5px;font-size:13px;font-family:"JetBrains Mono",Consolas,monospace}
+pre code{background:none;padding:0;color:inherit}
+.nav{display:flex;justify-content:space-between;margin:40px 0 20px;padding:16px 20px;background:var(--card);border-radius:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:var(--primary);text-decoration:none;font-weight:600;font-size:14px}
+.nav a:hover{text-decoration:underline}
+.callout{background:#fef3c7;border-left:4px solid var(--warn);padding:14px 18px;border-radius:8px;margin:20px 0;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.step{background:var(--card);padding:14px 18px;margin:10px 0;border-radius:10px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.step b{color:var(--primary)}
+table{border-collapse:collapse;width:100%;margin:20px 0;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th,td{border:1px solid var(--border);padding:10px 14px;text-align:left;font-size:14px}
+th{background:var(--primary-light);color:var(--primary);font-weight:600}
+.tip{background:#ecfdf5;border-left:4px solid var(--accent);padding:14px 18px;border-radius:8px;margin:20px 0}
+.warn{background:#fef2f2;border-left:4px solid #dc2626;padding:14px 18px;border-radius:8px;margin:20px 0}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1><span class="badge">S0.1</span>环境搭建：从零跑起整个工程</h1>
+<p><b>模块：</b><code>工程骨架</code> ｜ <b>前置：</b>无（这是第 1 步）</p>
+
+<h2>1. 需要装什么</h2>
+<table>
+<tr><th>工具</th><th>版本要求</th><th>验证命令</th></tr>
+<tr><td>JDK</td><td>21+（推荐 21 LTS 或 25）</td><td><code>java -version</code></td></tr>
+<tr><td>Maven</td><td>3.9+</td><td><code>mvn -v</code></td></tr>
+<tr><td>DeepSeek API Key</td><td>platform.deepseek.com 申请</td><td>设环境变量 <code>DEEPSEEK_API_KEY</code></td></tr>
+</table>
+
+<h2>2. 安装步骤（Windows）</h2>
+<div class="step"><b>步骤 1：装 JDK 21+</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;去 <a href="https://adoptium.net/">adoptium.net</a> 下载 Temurin 21，装完设 <code>JAVA_HOME</code>。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;验证：<code>java -version</code> 显示 21 或更高。</div>
+
+<div class="step"><b>步骤 2：装 Maven</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;去 <a href="https://maven.apache.org/download.cgi">maven.apache.org</a> 下载二进制包，解压后设 <code>MAVEN_HOME</code> 和 <code>PATH</code>。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;验证：<code>mvn -v</code> 显示版本号。</div>
+
+<div class="step"><b>步骤 3：申请 DeepSeek API Key</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;登录 <a href="https://platform.deepseek.com/">platform.deepseek.com</a> → API Keys → 创建。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Key 格式 <code>sk-xxxxxxxx</code>。</div>
+
+<div class="step"><b>步骤 4：配置 .env 文件（推荐，不用设系统环境变量）</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;工程根目录已有 <code>.env</code> 文件，填入你的 Key：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>DEEPSEEK_API_KEY=sk-your-api-key</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;程序启动时会自动读这个文件，<b>不需要手动设系统环境变量</b>。</div>
+
+<div class="step"><b>想切 Ollama 本地模型？</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;在 .env 里加一行：<code>LLM_PROVIDER=ollama</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;然后执行 <code>ollama pull qwen2.5</code> 拉模型，就能本地跑，不花一分钱。</div>
+
+<h2>3. 拉代码 + 一键验证</h2>
+<pre>cd your-project-directory
+mvn test</pre>
+<div class="tip"><b>看到什么算成功：</b>最后输出 <code>BUILD SUCCESS</code>，110 个测试全绿。说明环境 + 工程骨架都 OK。</div>
+
+<h2>4. 跑第一个 Demo（不需要 API Key）</h2>
+<pre>mvn -q -pl s31-supervisor exec:java "-Dexec.mainClass=com.example.agentlab.supervisor.SupervisorDemo"</pre>
+<div class="step">这是离线桩 Demo，不调真实 LLM，直接看路由轨迹。验证你本机 Maven + 编译链路通。</div>
+
+<h2>5. 跑第一个真实 LLM Demo</h2>
+<pre># 先确认 Key 已设
+echo $env:DEEPSEEK_API_KEY   # PowerShell
+
+mvn -q -pl s02-minimal-chat exec:java "-Dexec.mainClass=com.example.agentlab.minimalchat.ChatCli"</pre>
+<div class="step">命令行里输入"你好"，回车，看 DeepSeek 回复。多轮对话它能记住你上一句。</div>
+
+<h2>🌟 推荐：Web Console（浏览器体验）</h2>
+<pre># 启动 Web Console
+mvn -pl web-console spring-boot:run
+
+# 浏览器打开
+http://localhost:8080</pre>
+<div class="step">
+<b>Web Console 功能：</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;左侧：19 个 Demo 列表（按 Phase 分组）<br>
+&nbsp;&nbsp;&nbsp;&nbsp;右侧：聊天界面（输入框 + 消息列表）<br>
+&nbsp;&nbsp;&nbsp;&nbsp;底部：实时流程日志（每个关键节点都打印）<br>
+&nbsp;&nbsp;&nbsp;&nbsp;不用敲命令行，浏览器里直接选 Demo、对话、看流程
+</div>
+
+<h2>🚀 初学者快速上手</h2>
+<div class="step"><b>只花 10 分钟：</b>装 JDK → 装 Maven → 设 Key → <code>mvn test</code>。这四步做完，后面 17 个模块随便跑。</div>
+<div class="step"><b>IDE 推荐：</b>IntelliJ IDEA 社区版直接打开 <code>project-root</code> 根目录，它会自动识别 Maven 多模块工程。</div>
+<div class="step"><b>不想花钱？</b>离线 Demo（SupervisorDemo/OrchestratorDemo/CheckpointDemo 等）全是桩，不调 LLM，学架构思想完全够用。</div>
+
+<h2>6. 常见问题 FAQ</h2>
+<table>
+<tr><th>报错</th><th>原因</th><th>解决</th></tr>
+<tr><td><code>Could not find the selected project in the reactor</code></td><td>模块名改了</td><td>用新目录名（如 <code>s02-minimal-chat</code>），看本页命令</td></tr>
+<tr><td><code>缺少环境变量 DEEPSEEK_API_KEY</code></td><td>.env 文件没读到</td><td>确认 .env 文件在工程根目录，且 Key 已填；或加 <code>-am</code> 参数</td></tr>
+<tr><td><code>BUILD FAILURE: 编码</code></td><td>中文乱码</td><td>先执行 <code>chcp 65001</code>，或设 <code>MAVEN_OPTS=-Dfile.encoding=UTF-8</code></td></tr>
+<tr><td><code>401 Unauthorized</code></td><td>API Key 错/没设</td><td>检查 .env 文件里的 <code>DEEPSEEK_API_KEY</code> 是否正确</td></tr>
+<tr><td><code>Connection refused</code></td><td>网络不通/代理</td><td>检查公司代理，或换手机热点；或切 Ollama 本地</td></tr>
+<tr><td><code>程序包不存在</code></td><td>Maven 没下到依赖</td><td>先 <code>mvn dependency:resolve</code>，或删 <code>~/.m2/repository</code> 重下</td></tr>
+<tr><td><code>Exception in thread "main"</code></td><td>主类路径错</td><td>对照本页运行命令复制，别手敲</td></tr>
+</table>
+
+<div class="warn"><b>注意：</b>JDK 版本必须 21+。17 及以下编译会失败——本工程用了虚拟线程和 record 等 21+ 特性。</div>
+
+<div class="nav">
+<a href="index.html">← 全集目录</a>
+<a href="index.html">全集目录</a>
+<a href="s02-minimal-chat.html">S0.2 最小对话 →</a>
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.example.agentlab</groupId>
+        <artifactId>java-multi-agent-lab</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>web-console</artifactId>
+    <name>Web Console</name>
+    <description>统一 Web 控制台：浏览器里选择 Demo、对话体验多 Agent 系统</description>
+
+    <properties>
+        <spring-boot.version>3.3.5</spring-boot.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- 公共模块（LLM 工厂） -->
+        <dependency>
+            <groupId>com.example.agentlab</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- langchain4j 核心（AiServices + @Tool） -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+        <!-- S0.2 最小对话 -->
+        <dependency>
+            <groupId>com.example.agentlab</groupId>
+            <artifactId>minimal-chat</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- S3.1 Supervisor（离线桩） -->
+        <dependency>
+            <groupId>com.example.agentlab</groupId>
+            <artifactId>supervisor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>com.example.agentlab.webconsole.WebConsoleApplication</mainClass>
+                    <jvmArguments>--enable-native-access=ALL-UNNAMED</jvmArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

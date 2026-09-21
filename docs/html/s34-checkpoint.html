@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>S3.4 共享状态与检查点 - Java Multi-Agent Lab</title>
+<style>
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:900px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#fafafa}
+.badge{display:inline-block;background:#dc2626;color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;margin-right:8px}
+h1{color:#7f1d1d;border-bottom:3px solid #dc2626;padding-bottom:8px}
+h2{color:#dc2626;margin-top:32px;border-left:4px solid #dc2626;padding-left:10px}
+pre{background:#1e1e2e;color:#cdd6f4;padding:14px;border-radius:8px;overflow-x:auto;font-size:13px}
+code{background:#fee2e2;padding:2px 6px;border-radius:4px;font-size:13px}
+pre code{background:none;padding:0;color:inherit}
+.nav{display:flex;justify-content:space-between;margin:32px 0;padding:12px;background:#fee2e2;border-radius:8px}
+.nav a{color:#dc2626;text-decoration:none;font-weight:bold}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:16px 0}
+.step{background:#fff;padding:12px 16px;margin:8px 0;border-radius:8px;border:1px solid #fee2e2}
+.step b{color:#dc2626}
+
+/* === 统一美化覆盖 === */
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:#1e293b;background:#f8fafc}
+h1{color:#1e293b;border-bottom:3px solid #4f46e5;padding-bottom:14px;font-size:28px}
+h2{color:#4f46e5;border-left:4px solid #4f46e5;padding-left:12px;margin-top:36px;font-size:20px}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:5px;font-family:"JetBrains Mono",Consolas,monospace}
+.step{background:#fff;padding:14px 18px;border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:#4f46e5;font-weight:600}
+table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th{background:#eef2ff;color:#4f46e5;font-weight:600}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1><span class="badge">S3.4</span>检查点：落盘→崩溃恢复→时间旅行</h1>
+<p><b>模块：</b><code>checkpoint</code></p>
+
+<h2>1. 这个模块解决了什么</h2>
+<p>任务跑到一半崩溃了？检查点：每步落盘全状态，重启后从最新检查点恢复，从下一步继续，不重跑。</p>
+
+<h2>2. 机制</h2>
+<pre>Checkpoint(step, node, state, timestamp)
+   ↑ 每步执行后落盘
+CheckpointStore
+   ├─ MemoryCheckpointStore（进程内演示）
+   └─ FileCheckpointStore（JSON 文件，真正的关机恢复）</pre>
+
+<h2>3. 关键设计</h2>
+<div class="step"><b>step 序号即恢复指针：</b>跑完 step i 后落 step=i+1；resume 从 steps.get(step) 继续。</div>
+<div class="step"><b>时间旅行：</b><code>listHistory()</code> 返回全部历史快照，可回看任意中间时刻状态。</div>
+
+<h2>4. 逻辑流程</h2>
+<pre>run：落 step=0 → 跑 step1 → 落 step1 → 跑 step2 → 落 step2 ...
+   ↓ 崩溃
+resume：loadLatest → 拿到 step=2 → 从 steps.get(2) 继续</pre>
+
+<h2>5.5 核心类详解</h2>
+<h3>CheckpointDemo（演示入口）</h3>
+<div class="step">
+<b>作用：</b>启动检查点演示，展示崩溃恢复和时间旅行。
+</div>
+<h3>CheckpointedRunner（带检查点的执行器）</h3>
+<div class="step">
+<b>作用：</b>执行步骤序列，每步落盘检查点。<br><br>
+<b>方法：</b>
+<table>
+<tr><th>方法</th><th>作用</th><th>输入</th><th>输出</th></tr>
+<tr><td><code>run(String threadId, List&lt;Step&gt; steps, Map state)</code></td><td>执行步骤序列</td><td>线程 ID、步骤列表、初始状态</td><td>最终状态</td></tr>
+<tr><td><code>resume(String threadId, List&lt;Step&gt; steps)</code></td><td>从检查点恢复</td><td>线程 ID、步骤列表</td><td>恢复后的最终状态</td></tr>
+</table>
+</div>
+<h3>Checkpoint（检查点对象）</h3>
+<div class="step">
+<b>作用：</b>检查点的数据结构。<br><br>
+<b>字段：</b>threadId / step / node / state / timestamp
+</div>
+<h3>CheckpointStore（检查点存储接口）</h3>
+<div class="step">
+<b>作用：</b>定义检查点存储的接口。
+</div>
+<h3>Step（步骤接口）</h3>
+<div class="step">
+<b>作用：</b>定义步骤的接口。
+</div>
+<h2>🚀 初学者快速上手</h2>
+<div class="step"><b>前置知识：</b>理解"持久化"（存到磁盘）。</div>
+<div class="step"><b>核心概念一句话：</b>每步落盘全状态，崩溃了重启从上次继续，不重跑。</div>
+<div class="step"><b>跑起来看：</b>CheckpointDemo 跑到一半"崩溃"，恢复后继续，时间旅行看每步状态。</div>
+
+<h2>5. 运行命令</h2>
+<pre>mvn -q -pl s34-checkpoint exec:java "-Dexec.mainClass=com.example.agentlab.checkpoint.CheckpointDemo"</pre>
+
+<div class="callout"><b>教学版：</b>自实现检查点（不绑定 langgraph4j Checkpointer），聚焦"落盘/恢复/时间旅行"思想。</div>
+
+
+<h2>🌟 Web Console 体验示例</h2>
+<div class="step">
+<b>启动 Web Console：</b><code>mvn -pl web-console spring-boot:run</code>，然后打开 <b>http://localhost:8080</b>
+</div>
+<table>
+<tr><th>操作</th><th>内容</th></tr>
+<tr><td>左侧选择 Demo</td><td><code>s34</code></td></tr>
+<tr><td>输入示例</td><td><code>保存当前进度，然后恢复</code></td></tr>
+<tr><td>预期效果</td><td>状态落盘 → 模拟崩溃 → 从检查点恢复</td></tr>
+</table>
+<div class="callout">💡 <b>小技巧：</b>底部日志面板会实时打印每一步流程，拖动蓝色条可以调整日志面板高度。</div>
+<div class="nav">
+<a href="s33-protocol.html">← S3.3 协议</a>
+<a href="index.html">全集目录</a>
+<a href="s35-taskboard.html">S3.5 任务板 →</a>
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

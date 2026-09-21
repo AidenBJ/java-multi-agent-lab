@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Java Multi-Agent Lab - 全集教学串联</title>
+<style>
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:1000px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#fafafa}
+h1{color:#1e1b4b;text-align:center;border-bottom:3px solid #4f46e5;padding-bottom:12px}
+.sub{text-align:center;color:#666;margin-bottom:32px}
+.phase{margin:32px 0;padding:20px;border-radius:12px}
+.phase h2{margin-top:0}
+.p0{background:#eef2ff;border-left:6px solid #4f46e5}
+.p1{background:#ecfdf5;border-left:6px solid #059669}
+.p2{background:#ecfdf5;border-left:6px solid #059669}
+.p3{background:#fef2f2;border-left:6px solid #dc2626}
+.p4{background:#f5f3ff;border-left:6px solid #7c3aed}
+.modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+.card{background:#fff;padding:14px;border-radius:8px;border:1px solid #e0e7ff;text-decoration:none;color:#222;display:block}
+.card:hover{box-shadow:0 2px 8px rgba(0,0,0,.1);transform:translateY(-2px);transition:all .2s}
+.card b{color:#4f46e5}
+.card small{color:#888;display:block;margin-top:4px}
+.flow{background:#1e1e2e;color:#cdd6f4;padding:16px;border-radius:8px;font-size:13px;margin:16px 0}
+.stat{display:flex;gap:24px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.stat div{text-align:center}
+.stat b{font-size:28px;color:#4f46e5;display:block}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:16px 0}
+
+/* === 统一美化覆盖 === */
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:#1e293b;background:#f8fafc}
+h1{color:#1e293b;border-bottom:3px solid #4f46e5;padding-bottom:14px;font-size:28px}
+h2{color:#4f46e5;border-left:4px solid #4f46e5;padding-left:12px;margin-top:36px;font-size:20px}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:5px;font-family:"JetBrains Mono",Consolas,monospace}
+.step{background:#fff;padding:14px 18px;border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:#4f46e5;font-weight:600}
+table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th{background:#eef2ff;color:#4f46e5;font-weight:600}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1>Java Multi-Agent Lab</h1>
+<p class="sub">从最简单对话 → 完整多 Agent 系统的渐进学习路线 ｜ 18 模块 / 110 测试全绿</p>
+
+<div class="stat">
+<div><b>18</b>个 Maven 模块</div>
+<div><b>110</b>个 JUnit 测试</div>
+<div><b>5</b>个演进阶段</div>
+<div><b>17</b>篇教学笔记</div>
+</div>
+
+<div class="callout"><b>核心心法：</b>Agency 来自模型，Agent 产品 = 模型 + Harness（载具）。循环永远不变：<code>messages → LLM → 有工具调用？→ 执行 → 回填 → 循环</code>。</div>
+
+<div class="callout" style="background:#ecfdf5;border-left-color:#059669"><b>🌟 推荐入口：Web Console</b><br>
+浏览器里直接体验所有 Demo，不用敲命令行：<br>
+<code>mvn -pl web-console spring-boot:run</code><br>
+然后打开 <b>http://localhost:8080</b>，左侧选 Demo，右侧对话，底部实时看流程日志。</div>
+
+<h2 style="color:#4f46e5;margin-top:40px">🚀 初学者快速上手（5 分钟跑起来）</h2>
+<div class="phase p0">
+<h3 style="margin-top:0">环境准备（只需 3 步）</h3>
+<div style="background:#fff;padding:16px;border-radius:8px;margin:8px 0">
+<b>1. 装 JDK 21+ 和 Maven 3.9+</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;本工程编译目标 21，本机用 JDK 25 也能跑。<br><br>
+<b>2. 配置 API Key（.env 文件方式，推荐）</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;工程根目录已有 <code>.env</code> 文件，填入你的 Key：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>DEEPSEEK_API_KEY=sk-your-api-key</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;程序自动读取，<b>不用设系统环境变量</b>。<br><br>
+<b>3. 一键构建验证</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>cd your-project-directory</code> 然后 <code>mvn test</code>——110 个测试全绿说明环境 OK。
+</div>
+<h3 style="margin-top:24px">第一个例子跑起来</h3>
+<div style="background:#1e1e2e;color:#cdd6f4;padding:16px;border-radius:8px;font-size:13px;margin:8px 0">
+# 跑 S0.2 最小对话（需要 API Key）<br>
+mvn -q -pl s02-minimal-chat exec:java "-Dexec.mainClass=com.example.agentlab.minimalchat.ChatCli"<br><br>
+# 跑 S3.1 Supervisor（离线，不需要 API Key）<br>
+mvn -q -pl s31-supervisor exec:java "-Dexec.mainClass=com.example.agentlab.supervisor.SupervisorDemo"
+</div>
+<div class="callout" style="margin-top:12px"><b>提示：</b>离线 Demo（模块名带 Demo 的）不需要 API Key，直接跑。真实 LLM 调用的模块需要 .env 里配好 Key。<br>
+<b>想切 Ollama 本地模型？</b>在 .env 里加一行 <code>LLM_PROVIDER=ollama</code>，然后 <code>ollama pull qwen2.5</code>。</div>
+</div>
+
+<h2 style="color:#4f46e5">📚 建议学习顺序</h2>
+<div style="background:#fff;padding:16px;border-radius:8px;margin:8px 0">
+<b>第 1 周（Phase 0+1）：</b>跑通 S0.2 → 读懂 S1.1 Agent Loop → 试 S1.2 工具系统<br>
+<b>第 2 周（Phase 2）：</b>S2.1 规划 → S2.2 子 Agent → S2.3 记忆<br>
+<b>第 3 周（Phase 3）：</b>S3.1 Supervisor → S3.2 Orchestrator → S3.3 协议<br>
+<b>第 4 周（Phase 4）：</b>S4.1 任务系统 → S4.4 综合项目收尾
+</div>
+
+<div class="flow">
+用户输入 → LLM → 有 tool_use？→ 执行工具 → 回填 tool_result → 循环 → 返回文本
+</div>
+
+<div class="phase p0">
+<h2>Phase 0 · 地基：环境与最小对话</h2>
+<div class="modules">
+<a class="card" href="s01-env-setup.html"><b>S0.1 环境搭建</b><small>装 JDK/Maven/Key + 一键验证</small></a>
+<a class="card" href="s02-minimal-chat.html"><b>S0.2 最小对话</b><small>命令行多轮 + 流式输出</small></a>
+</div>
+</div>
+
+<div class="phase p1">
+<h2>Phase 1 · 单 Agent：从对话到能干活</h2>
+<div class="modules">
+<a class="card" href="s11-agent-loop.html"><b>S1.1 Agent Loop</b><small>手写循环 vs 状态图</small></a>
+<a class="card" href="s12-tool-use.html"><b>S1.2 工具系统</b><small>@Tool 注解调用外部能力</small></a>
+<a class="card" href="s13-permission.html"><b>S1.3 权限确认</b><small>未确认绝不执行</small></a>
+<a class="card" href="s14-hooks.html"><b>S1.4 Hooks</b><small>观察者模式记录轨迹</small></a>
+</div>
+</div>
+
+<div class="phase p2">
+<h2>Phase 2 · 复杂任务：规划、记忆、鲁棒</h2>
+<div class="modules">
+<a class="card" href="s21-planning.html"><b>S2.1 规划 Todo</b><small>大任务拆成可执行清单</small></a>
+<a class="card" href="s22-subagent.html"><b>S2.2 子 Agent</b><small>上下文隔离与委派</small></a>
+<a class="card" href="s23-memory.html"><b>S2.3 记忆系统</b><small>跨会话长期记忆</small></a>
+<a class="card" href="s24-context-compact.html"><b>S2.4 上下文压缩</b><small>四层管线压缩历史</small></a>
+<a class="card" href="s25-error-recovery.html"><b>S2.5 错误恢复</b><small>退避重试 + 切模型</small></a>
+</div>
+</div>
+
+<div class="phase p3">
+<h2>Phase 3 · 多 Agent 协同（工程核心）</h2>
+<div class="modules">
+<a class="card" href="s31-supervisor.html"><b>S3.1 Supervisor</b><small>主管判断活派给谁</small></a>
+<a class="card" href="s32-orchestrator.html"><b>S3.2 Orchestrator</b><small>拆解→并行→聚合</small></a>
+<a class="card" href="s33-protocol.html"><b>S3.3 通信协议</b><small>结构化信封 + handoff</small></a>
+<a class="card" href="s34-checkpoint.html"><b>S3.4 检查点</b><small>落盘→崩溃恢复→时间旅行</small></a>
+<a class="card" href="s35-taskboard.html"><b>S3.5 任务板</b><small>乐观锁认领 + 宕机交接</small></a>
+<a class="card" href="s36-bus.html"><b>S3.6 团队总线</b><small>订阅/广播/定向 + 邮箱</small></a>
+</div>
+</div>
+
+<div class="phase p4">
+<h2>Phase 4 · 工程化与合体</h2>
+<div class="modules">
+<a class="card" href="s41-tasksystem.html"><b>S4.1 任务系统</b><small>任务图 DAG + 落盘续跑</small></a>
+<a class="card" href="s42-scheduler.html"><b>S4.2 后台定时</b><small>虚拟线程后台 + 定时</small></a>
+<a class="card" href="s43-mcp.html"><b>S4.3 MCP 工具池</b><small>外部工具统一接入</small></a>
+<a class="card" href="s44-capstone.html"><b>S4.4 综合项目</b><small>端到端流水线（收官）</small></a>
+</div>
+</div>
+
+<div class="callout" style="text-align:center;margin-top:32px">
+<b>学习流程：</b>按 Phase 0→1→2→3→4 顺序逐个点开模块，每篇含知识点讲解 + 实现步骤 + 逻辑流程图 + 关键代码 + 运行命令。
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

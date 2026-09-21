@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>S2.1 规划 Todo - Java Multi-Agent Lab</title>
+<style>
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:900px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#fafafa}
+.badge{display:inline-block;background:#059669;color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;margin-right:8px}
+h1{color:#064e3b;border-bottom:3px solid #059669;padding-bottom:8px}
+h2{color:#059669;margin-top:32px;border-left:4px solid #059669;padding-left:10px}
+pre{background:#1e1e2e;color:#cdd6f4;padding:14px;border-radius:8px;overflow-x:auto;font-size:13px}
+code{background:#d1fae5;padding:2px 6px;border-radius:4px;font-size:13px}
+pre code{background:none;padding:0;color:inherit}
+.nav{display:flex;justify-content:space-between;margin:32px 0;padding:12px;background:#d1fae5;border-radius:8px}
+.nav a{color:#059669;text-decoration:none;font-weight:bold}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:16px 0}
+.step{background:#fff;padding:12px 16px;margin:8px 0;border-radius:8px;border:1px solid #d1fae5}
+.step b{color:#059669}
+
+/* === 统一美化覆盖 === */
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;max-width:920px;margin:0 auto;padding:32px 24px;line-height:1.75;color:#1e293b;background:#f8fafc}
+h1{color:#1e293b;border-bottom:3px solid #4f46e5;padding-bottom:14px;font-size:28px}
+h2{color:#4f46e5;border-left:4px solid #4f46e5;padding-left:12px;margin-top:36px;font-size:20px}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+pre{background:#1e1e2e;color:#cdd6f4;padding:16px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+code{background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:5px;font-family:"JetBrains Mono",Consolas,monospace}
+.step{background:#fff;padding:14px 18px;border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,.03);transition:transform .15s,box-shadow .15s}
+.step:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.callout{background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,.1)}
+.nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.nav a{color:#4f46e5;font-weight:600}
+table{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+th{background:#eef2ff;color:#4f46e5;font-weight:600}
+
+/* === 交互增强 === */
+/* 文字大小统一调整 */
+body{font-size:16.5px;line-height:1.8}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17.5px}
+code,pre{font-size:14px}
+p,li,td,th{font-size:16px}
+.step{font-size:16px}
+/* 章节折叠按钮 */
+.collapse-btn{cursor:pointer;user-select:none;display:inline-block;margin-left:8px;color:#94a3b8;font-size:14px;transition:transform .2s}
+.collapse-btn.open{transform:rotate(90deg)}
+.collapse-content{transition:max-height .3s ease,opacity .3s ease;overflow:hidden}
+.collapse-content.closed{max-height:0!important;opacity:0}
+/* 返回顶部按钮 */
+#back-to-top{position:fixed;bottom:32px;right:32px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);display:none;z-index:999;transition:transform .2s}
+#back-to-top:hover{transform:translateY(-3px)}
+#back-to-top.show{display:block}
+/* 代码块复制按钮 */
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#334155;color:#cdd6f4;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;opacity:.7;transition:opacity .2s;font-family:inherit}
+.copy-btn:hover{opacity:1;background:#475569}
+.copy-btn.copied{background:#059669;color:#fff}
+
+/* === 修复折叠 + 字体调大 === */
+body{font-size:18px!important;line-height:1.85!important}
+h1{font-size:32px!important}
+h2{font-size:23px!important}
+h3{font-size:19px!important}
+p,li,td,th,.step{font-size:17.5px!important}
+code,pre{font-size:15px!important}
+/* 折叠修复：直接给 closed class 加样式 */
+.closed{max-height:0!important;opacity:0!important;overflow:hidden!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border:none!important}
+</style>
+</head>
+<body>
+<h1><span class="badge">S2.1</span>规划 Todo：把大任务拆成可执行清单</h1>
+<p><b>模块：</b><code>planning</code></p>
+
+<h2>1. 这个模块解决了什么</h2>
+<p>"重构整个后端"太大了，LLM 不知道从哪下手。规划 Todo：先让 LLM 把大任务拆成小步骤清单，确认后逐步执行。</p>
+
+<h2>2. 核心知识点</h2>
+<div class="step"><b>结构化输出：</b>让 LLM 返回 <code>Plan</code>（List&lt;TodoItem&gt;），不是自由文本。</div>
+<div class="step"><b>todo_write 工具：</b>LLM 自己调用工具写 Todo 清单，nag reminder 提醒未完成项。</div>
+<div class="step"><b>确认闭环：</b>拆完先给人确认，改完再执行。</div>
+
+<h2>3. 实现步骤</h2>
+<div class="step"><b>路线 A（工具驱动）：</b><code>TodoWriteTool</code> + <code>TodoLoop</code>——LLM 自己维护清单。</div>
+<div class="step"><b>路线 B（结构化）：</b><code>Planner</code> → AiServices 返回 <code>Plan</code>，确认后 <code>PlanExecutor</code> 逐条执行。</div>
+
+<h2>4. 逻辑流程</h2>
+<pre>大任务
+   ↓
+LLM 拆成 Plan（5 个 Todo）
+   ↓
+给人确认 / 修改
+   ↓
+逐条执行：TodoLoop 循环，todo_write 工具更新状态
+   ↓
+全部 done</pre>
+
+<h2>5. 关键代码</h2>
+<pre>record TodoItem(String content, TodoStatus status) {}
+record Plan(List<TodoItem> items) {}
+
+Planner planner = AiServices.builder(Planner.class)
+    .chatModel(model).build();
+Plan plan = planner.plan("重构后端");</pre>
+
+<h2>5.5 核心类详解</h2>
+<h3>Planner（任务拆解器）</h3>
+<div class="step">
+<b>作用：</b>把大任务拆解成可执行的 Todo 清单。<br><br>
+<b>方法：</b>
+<table>
+<tr><th>方法</th><th>作用</th><th>输入</th><th>输出</th></tr>
+<tr><td><code>plan(String task)</code></td><td>拆解任务</td><td>任务描述</td><td>Todo 清单</td></tr>
+</table>
+</div>
+<h3>TodoList（待办清单）</h3>
+<div class="step">
+<b>作用：</b>存储拆解后的待办任务列表。
+</div>
+<h3>Executor（执行器）</h3>
+<div class="step">
+<b>作用：</b>逐个执行 Todo 清单里的任务。
+</div>
+<h2>🚀 初学者快速上手</h2>
+<div class="step"><b>前置知识：</b>理解结构化输出（让 LLM 返回 JSON 而不是自由文本）。</div>
+<div class="step"><b>核心概念一句话：</b>大任务先让 LLM 拆成小步骤清单，确认后逐步执行。</div>
+<div class="step"><b>两条路线选着学：</b>路线 A（工具驱动）更像 Claude Code；路线 B（结构化计划）更可控。先学 B。</div>
+
+<h2>6. 运行命令</h2>
+<pre>mvn -q -pl s21-planning exec:java "-Dexec.mainClass=com.example.agentlab.planning.PlanningCli"</pre>
+
+<div class="callout"><b>两条路线：</b>路线 A 是 LLM 自己用工具维护清单（更像 Claude Code）；路线 B 是显式结构化计划（更可控）。</div>
+
+
+<h2>🌟 Web Console 体验示例</h2>
+<div class="step">
+<b>启动 Web Console：</b><code>mvn -pl web-console spring-boot:run</code>，然后打开 <b>http://localhost:8080</b>
+</div>
+<table>
+<tr><th>操作</th><th>内容</th></tr>
+<tr><td>左侧选择 Demo</td><td><code>s21</code></td></tr>
+<tr><td>输入示例</td><td><code>写一篇关于 Java 多线程的技术文章</code></td></tr>
+<tr><td>预期效果</td><td>Agent 先拆解成多个 Todo 步骤 → 逐个执行 → 汇总</td></tr>
+</table>
+<div class="callout">💡 <b>小技巧：</b>底部日志面板会实时打印每一步流程，拖动蓝色条可以调整日志面板高度。</div>
+<div class="nav">
+<a href="s14-hooks.html">← S1.4 Hooks</a>
+<a href="index.html">全集目录</a>
+<a href="s22-subagent.html">S2.2 子 Agent →</a>
+</div>
+<script>
+// 返回顶部按钮
+(function(){
+  var btn=document.createElement('button');
+  btn.id='back-to-top';btn.title='返回顶部';btn.innerHTML='↑';
+  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  document.body.appendChild(btn);
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>400){btn.classList.add('show')}else{btn.classList.remove('show')}
+  });
+})();
+// 代码块复制按钮
+document.querySelectorAll('pre').forEach(function(pre){
+  var btn=document.createElement('button');
+  btn.className='copy-btn';btn.textContent='复制';
+  btn.onclick=function(){
+    var text=pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='已复制';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied')},1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+// h2 章节折叠
+document.querySelectorAll('h2').forEach(function(h2){
+  var btn=document.createElement('span');
+  btn.className='collapse-btn open';btn.textContent='▶';
+  h2.appendChild(btn);
+  btn.onclick=function(e){
+    e.stopPropagation();
+    btn.classList.toggle('open');
+    var content=h2.nextElementSibling;
+    var collapsed=btn.classList.contains('open')===false;
+    while(content && content.tagName!=='H2'){
+      content.classList.toggle('closed',collapsed);
+      content=content.nextElementSibling;
+    }
+  };
+});
+</script>
+</body>
+</html>

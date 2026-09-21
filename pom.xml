@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example.agentlab</groupId>
+    <artifactId>java-multi-agent-lab</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Java Multi-Agent Lab</name>
+    <description>多 Agent 协同学习工程：从最小对话到完整多 Agent 系统</description>
+
+    <modules>
+        <module>common</module>
+        <!-- Phase 0：环境与最小对话 -->
+        <module>s02-minimal-chat</module>
+        <!-- Phase 1：单 Agent 基础 -->
+        <module>s11-agent-loop</module>
+        <module>s12-tool-use</module>
+        <module>s13-permission</module>
+        <module>s14-hooks</module>
+        <!-- Phase 2：复杂任务 -->
+        <module>s21-planning</module>
+        <module>s22-subagent</module>
+        <module>s23-memory</module>
+        <module>s24-context-compact</module>
+        <!-- Phase 3：多 Agent 协同 -->
+        <module>s31-supervisor</module>
+        <module>s32-orchestrator</module>
+        <module>s33-protocol</module>
+        <module>s34-checkpoint</module>
+        <module>s35-taskboard</module>
+        <module>s36-bus</module>
+        <module>s41-tasksystem</module>
+        <module>s42-scheduler</module>
+        <module>s43-mcp</module>
+        <module>s44-capstone</module>
+        <!-- Web 控制台（统一入口） -->
+        <module>web-console</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 版本以 2026-09-21 在 Maven Central 核实为准 -->
+        <langchain4j.version>1.20.0</langchain4j.version>
+        <langgraph4j.version>1.8.27</langgraph4j.version>
+        <langgraph4j.langchain4j.version>1.8.20</langgraph4j.langchain4j.version>
+        <junit.version>5.11.4</junit.version>
+        <assertj.version>3.27.3</assertj.version>
+        <logback.version>1.5.16</logback.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- langchain4j BOM：统一管理 langchain4j 各模块版本 -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>${langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- langgraph4j：1.8.x 为 LTS 稳定线；langchain4j 集成模块版本独立演进 -->
+            <dependency>
+                <groupId>org.bsc.langgraph4j</groupId>
+                <artifactId>langgraph4j-core</artifactId>
+                <version>${langgraph4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bsc.langgraph4j</groupId>
+                <artifactId>langgraph4j-langchain4j</artifactId>
+                <version>${langgraph4j.langchain4j.version}</version>
+            </dependency>
+            <!-- 测试与日志 -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.2</version>
+                    <configuration>
+                        <!-- 保证测试输出中文不乱码 -->
+                        <argLine>-Dfile.encoding=UTF-8</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
